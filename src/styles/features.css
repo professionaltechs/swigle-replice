@@ -1,0 +1,81 @@
+.featuresMain {
+    background: url('../images/BackgroundGrey.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 70px 10px;
+}
+
+.offeringHeadings {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.featuresCards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0px auto;
+}
+
+.card {
+    border-radius: 20px;
+    padding: 20px 10px; 
+    text-align: center;
+    transition: all 400ms;
+}
+
+.cardLogo {
+    font-size: 60px;
+    margin: 0px auto;
+    display: block;
+    width: fit-content;
+    margin-bottom: 20px;
+}
+
+.cardHeading {
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.cardPara {
+    font-weight: 300;
+    max-width: 385px;
+    margin: 0px auto;
+}
+
+@media(min-width: 650px) {
+    .featuresCards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media(min-width: 900px) {
+    .featuresCards {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media(min-width: 1024px) {
+    .featuresCards {
+        gap: 30px;
+    }
+
+    .card {
+        padding: 60px 10px; 
+        cursor: pointer;
+    }
+
+    .card:hover {
+        background-color: #171717;
+        color: white;
+        transform: scale(1.05);
+    }
+}
+
+@media(min-width: 1280px) {
+    .featuresMain {
+        padding: 100px 10px;
+    }
+}

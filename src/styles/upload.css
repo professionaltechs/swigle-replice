@@ -1,0 +1,58 @@
+.uploadMain {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 50px;
+    padding: 0px 20px;
+}
+
+.uploadHeading {
+    background-color: #A19F9F;
+    width: fit-content;
+    padding: 20px 10px;
+    border-radius: 20px;
+    margin: 0px auto;
+    color: #070707;
+    text-align: center;
+}
+
+.uploadHeading h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.uploadHeading h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.uploadInner {
+    backdrop-filter: blur(6px);
+    text-align: center;
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    width: 100%;
+    padding: 70px 20px;
+    margin: auto;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    max-width: 600px;
+    color: white;
+}
+
+
+@media(min-width: 768px) {
+    .uploadHeading {
+        padding: 15px 35px;
+    }
+
+    .uploadHeading h1 { 
+        font-size: 34px;
+    }
+
+    .uploadHeading h3 {
+        font-size: 26px;
+    }
+}
