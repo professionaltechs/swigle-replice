@@ -42,6 +42,12 @@
     color: white;
 }
 
+.uploadContainer > div {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 600px;
+}
 
 @media(min-width: 768px) {
     .uploadHeading {

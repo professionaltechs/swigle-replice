@@ -4,7 +4,7 @@ import React from 'react'
 import { IoMenuOutline } from "react-icons/io5";
 
 // STYLING
-import '../styles/navbar.css'
+import '../../styles/navbar.css'
 
 const Navbar = () => {
     return (

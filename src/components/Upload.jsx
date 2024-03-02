@@ -16,7 +16,7 @@ const Upload = () => {
                     <h1>Safely and effortlessly transfer your files</h1>
                     <h3>Easily and securely send files of up to 20GB*</h3>
                 </div>
-                <div>
+                <div className='uploadContainer'>
                     <div {...getRootProps()}>
                         <input {...getInputProps()} />
                         {
