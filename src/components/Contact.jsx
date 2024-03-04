@@ -42,7 +42,6 @@ const Contact = () => {
               class="form-control"
               id="email_addr"
               name="email"
-              placeholder="email"
             />
           </div>
           <div class="col">
@@ -54,7 +53,6 @@ const Contact = () => {
               class="form-control"
               id="phone_input"
               name="Phone"
-              placeholder="Phone"
             />
           </div>
         </div>
