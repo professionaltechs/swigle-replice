@@ -4,6 +4,7 @@ import React from "react";
 import Navbar from "../components/Layout/Navbar";
 import Upload from "../components/Upload";
 import Features from "../components/Features";
+import Attributes from "../components/Attributes";
 import Pricing from "../components/Pricing";
 import Contact from "../components/Contact";
 
@@ -17,11 +18,12 @@ const Home = () => {
         <Navbar />
         <Upload />
       </div>
-      <Features />
+      {/* <Features /> */}
+      <Attributes/>
       <Pricing />
       <Contact />
     </>
   );
 };
 
-export default Home;
+export default Home;  

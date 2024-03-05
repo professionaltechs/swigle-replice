@@ -1,0 +1,76 @@
+.attributeMain {
+  padding: 70px 10px;
+}
+
+.attributeMainHeading {
+  text-align: center;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.attributesContainer {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.attributeCard {
+  display: flex;
+  flex-direction: column;
+  max-width: 350px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.attributeCardImage {
+  width: 100%;
+  height: auto;
+  max-width: 350px;
+}
+
+.attributeCardContent {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.attributeCardContentPara {
+  margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+  .attributeMain {
+    padding: 100px 40px;
+  }
+
+  .attributesContainer {
+    margin-top: 100px;
+    gap: 80px;
+  }
+
+  .attributeCard {
+    width: 100%;
+    max-width: 1000px;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .attributeCardReverse {
+    flex-direction: row-reverse !important;
+  }
+
+  .attributeCardImage {
+    height: auto;
+    max-width: 400px;
+  }
+
+  .attributeCardContent {
+    margin-top: 0px;
+    text-align: left;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}

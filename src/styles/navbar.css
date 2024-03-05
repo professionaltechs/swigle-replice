@@ -1,59 +1,124 @@
 .navbarMain {
-    display: flex;
-    align-items: center;
-    padding: 15px 25px;
-    justify-content: space-between;
-    color: #E0E5E7;
+  display: flex;
+  align-items: center;
+  padding: 15px 25px;
+  justify-content: space-between;
+  color: #e0e5e7;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 1000;
+  transition: all 400ms;
 }
 
 .navLinks {
-    display: none;
+  display: none;
+  margin-bottom: 0px;
 }
 
-@media(min-width: 768px) {
-    .navbarMain {
-        padding: 25px 35px;
-    }
+.contactUsLink {
+  background-color: black !important;
+  color: white !important;
+}
 
-    .menuIcon {
-        display: none;
-    }
+.sidebar {
+  position: fixed;
+  right: 100%;
+  width: 100%;
+  z-index: 1000;
+  /* background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.5)); */
+  transition: all 400ms;
+}
 
-    .navLinks {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
+.sidebarInner {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  color: black;
+  font-weight: 500;
+  height: 100%;
+  width: 300px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 80px 10px;
+}
 
-    .navLink {
-        padding: 5px 15px;
-        border-radius: 20px;
-        list-style: none;
-        position: relative;
-        z-index: 1;
-        cursor: pointer;
-        overflow: hidden;
-    }
+.navLinksMobile {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 
-    .navLink:hover {
-        color: black;
-    }
+.navLinkMobile,
+.contactUsLinkMobile {
+  list-style: none;
+}
 
-    .navLink::before {
-        content: '';
-        position: absolute;
-        left: -100%;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #E7E7E7;
-        border-radius: 20px;
-        z-index: -1;
-        transition: all 400ms;
-    }
+.navbarActive {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  color: black;
+}
 
-    .navLink:hover::before {
-        width: 100%;
-        left: 0;
-    }
+.sidebarActive {
+  right: 0;
+}
+
+.menuIcon {
+    font-size: 25px;
+}
+
+@media (min-width: 768px) {
+  .navbarMain {
+    padding: 25px 35px;
+  }
+
+  .menuIcon {
+    display: none;
+  }
+
+  .navLinks {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .navLink {
+    padding: 5px 15px;
+    border-radius: 20px;
+    list-style: none;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .contactUsLink {
+    padding: 5px 15px;
+    border-radius: 20px;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .navLink:hover {
+    color: black;
+  }
+
+  .navLink::before {
+    content: "";
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #e7e7e7;
+    border-radius: 20px;
+    z-index: -1;
+    transition: all 400ms;
+  }
+
+  .navLink:hover::before {
+    width: 100%;
+    left: 0;
+  }
 }
