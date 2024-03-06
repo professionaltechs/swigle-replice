@@ -1,4 +1,4 @@
-.uploadMain {
+/* .uploadMain {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -158,5 +158,312 @@
   }
   to {
     rotate: 360deg;
+  }
+} */
+
+.uploadSection {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.uploadSectionInner {
+  width: 100%;
+  max-height: 100vh;
+  position: relative;
+  display: flex;
+}
+
+.uploadSectionImageSection {
+  width: 100%;
+  transition: all 400ms;
+  position: relative;
+}
+
+.uploadSectionImage {
+  width: 100%;
+  height: auto;
+  max-height: 100vh;
+  object-fit: cover;
+  transition: all 400ms;
+}
+
+.uploadSectionImageSectionOptions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.uploadSectionImageSectionOptionsHeading {
+  margin-bottom: 0px;
+}
+
+.uploadSectionImageSectionOptionsSend {
+  position: absolute;
+  bottom: 43%;
+  left: 17%;
+}
+
+.uploadSectionImageSectionOptionsRecieve {
+  position: absolute;
+  bottom: 43%;
+  right: 17%;
+}
+
+.uploadSectionImageSectionOptionsSend,
+.uploadSectionImageSectionOptionsRecieve {
+  cursor: pointer;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  background: rgb(74, 76, 79);
+  backdrop-filter: blur(5.9px);
+  -webkit-backdrop-filter: blur(5.9px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.rotatingBorder {
+  position: absolute;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  border: 4px dashed #2d3250;
+  border-radius: 50%;
+  /* animation: Rotate 40s linear infinite; */
+  transition: all 300ms;
+}
+
+
+.uploadSectionImageSectionOptionsSend:hover .rotatingBorder {
+  border: 4px dashed #2d3250;
+  animation: Rotate 10s linear infinite;
+  transform: scale(1.1);
+}
+
+.uploadSectionImageSectionOptionsRecieve:hover .rotatingBorder {
+  border: 4px dashed #2d3250;
+  animation: Rotate 10s linear infinite;
+  transform: scale(1.1);
+}
+
+.uploadSectionContent {
+  width: 0%;
+  transition: all 400ms;
+}
+
+.uploadSectionImageSectionOptionsConteiner {
+  height: 0px;
+  overflow: hidden;
+  transition: all 500ms;
+}
+
+.uploadSectionImageSectionChangeOption {
+  /* position: absolute;
+  bottom: -30px;
+  left: 0;
+  right: 0; */
+  width: fit-content;
+  margin: 0px auto;
+}
+
+.uploadSectionContentInner {
+  width: 100%;
+  max-width: 500px;
+  margin-left: auto;
+  height: 100%;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.uploadSectionContentInnerHeading {
+  text-align: center;
+}
+
+.uploadedFiles {
+  flex-grow: 1;
+  border: solid 1px #C1C1C1;
+  background-color: #F1F1F1;
+  overflow-y: auto;
+  border-radius: 10px;
+  max-height: 350px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.uploadedFilesInner {
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.uploadedFilesList {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+}
+
+.uploadFileButtonContainer {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.uploadFileButton {
+  display: block !important;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+.inputKey {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: solid 1px #E1E6E8;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+}
+
+.inputKey:focus {
+  outline: none;
+}
+
+.uploadSectionContentMobile {
+  display: none;
+}
+
+.uploadedFilesType {
+  padding: 0px 20px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+  position: sticky;
+  bottom: 0px;
+  background-color: #F1F1F1;
+  margin-bottom: 0px;
+}
+
+.directLinkEmail {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding-bottom: 10px;
+}
+
+@keyframes Rotate {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (max-width: 1199px) {
+  .uploadSectionImageSectionOptionsRecieve,
+  .uploadSectionImageSectionOptionsSend {
+    width: 80px;
+    height: 80px;
+  }
+
+  .uploadSectionImageSectionOptionsHeading {
+    font-size: 12px;
+  }
+
+  .uploadedFiles {
+    max-height: 230px;
+  }
+}
+
+@media (max-width: 991px) {
+  .uploadSectionImageSectionOptionsRecieve,
+  .uploadSectionImageSectionOptionsSend {
+    width: 60px;
+    height: 60px;
+  }
+
+  .uploadSectionImageSectionOptionsHeading {
+    font-size: 11px;
+  }
+
+  .uploadSectionInner {
+    gap: 30px;
+  }
+
+  .uploadSectionImageSectionChangeOption {
+    bottom: -23px;
+  }
+
+  .uploadedFilesType {
+    padding: 0px 5px;
+    font-size: 14px;
+  }
+
+  .directLinkEmail {
+    gap: 20px;
+  }
+}
+
+@media(max-width: 767px) {
+  .uploadSectionImageSectionOptions, .uploadSectionImageSectionChangeOption, .uploadSectionContent{
+    display: none;
+  }
+
+  .uploadSectionImageSection {
+    width: 100% !important;
+  }
+
+  .uploadSection {
+    flex-direction: column;
+    align-items: start;
+    padding-top: 80px;
+  }
+
+  .uploadSectionContentMobile {
+    margin-top: 50px;
+    display: block;
+    width: 100%;
+    max-width: 430px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+  }
+
+  .uploadedFiles {
+    height: 300px;
+    overflow-y: auto;
+  }
+
+  .uploadFileButtonContainer {
+    margin-top: 20px;
+  }
+}
+
+@media(max-width: 530px) {
+  .uploadSection  {
+    padding-top: 125px;
+  }
+
+  .attributeMain {
+    padding-top: 90px !important;
+  }
+
+  .uploadSectionContentMobile {
+    gap: 70px;
   }
 }
