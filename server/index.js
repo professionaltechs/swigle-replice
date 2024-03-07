@@ -8,7 +8,7 @@ app.use(express.json());
 // ROUTES
 const uploadRouter = require("./routes/upload");
 
-app.use('/upload',uploadRouter )
+app.use('/files',uploadRouter )
 
 app.listen(port, () => {
   console.log("Server running on port " + port);
