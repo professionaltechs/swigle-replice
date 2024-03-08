@@ -67,7 +67,7 @@ const Upload = () => {
 
   // API FUNCTIONS
   const sendFile = async () => {
-    setUploadingStatus(true)
+    setUploadingStatus(true);
     const data = new FormData();
     files.forEach((file, i) => {
       data.append(`files`, file);
@@ -79,26 +79,25 @@ const Upload = () => {
       },
       onDownloadProgress: (progressEvent) => {
         const progress = 50 + (progressEvent.loaded / progressEvent.total) * 50;
-        console.log(progress);
         setProgress(progress);
       },
     });
     if (response?.data?.success) {
       setCode(response?.data?.file?.code);
       setFiles([]);
-      setUploadingStatus(false)
+      setUploadingStatus(false);
       setProgress(0);
       return toast.success("File uploaded successfully!");
     }
     toast.error("Error occured. Please try again!");
-    setUploadingStatus(false)
+    setUploadingStatus(false);
     setProgress(0);
   };
 
   const recieveFile = async () => {
     const response = await downloadFile.get(`/${code}`);
-    if (!response?.data?.success) {
-      return toast.error(response?.data?.message);
+    if (!response?.status === 200) {
+      return toast.error("Something went wrong");
     }
     const href = URL.createObjectURL(response?.data);
     const link = document.createElement("a");
