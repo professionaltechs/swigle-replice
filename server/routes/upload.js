@@ -7,12 +7,10 @@ const { uploadFiles, downloadFiles } = require("../controllers/upload");
 // MULTER
 const upload = require("../config/multer");
 
-router.post(
-  "/uploadFiles",
-//   zipConverter,
-//   upload,
-  uploadFiles
-);
+router.post("/uploadFiles", 
+// upload, 
+uploadFiles);
+
 router.get("/download/:code", downloadFiles);
 
 module.exports = router;

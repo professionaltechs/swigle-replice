@@ -1,18 +1,23 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import './App.css'
+import "./App.css";
 
 // PAGES
 import Home from "./pages/Home";
 
-function App() {
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home/>} />
-      </Routes>
-    </BrowserRouter>
-  )
+    <>
+      <ToastContainer />س
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 }
 
-export default App
+export default App;

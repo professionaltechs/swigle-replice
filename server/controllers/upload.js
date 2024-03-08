@@ -1,5 +1,6 @@
 const fs = require("fs");
 const archiver = require("archiver");
+const multer = require("multer");
 
 // HELPERS
 const { createZip, deleteTempFiles } = require("../helpers/upload");
@@ -26,6 +27,7 @@ const uploadFiles = (req, res) => {
         const fileNames = req.files.map((file) => file.filename);
         deleteTempFiles(fileNames);
         res.send({
+          success: true,
           message: "Files uploaded successfully.",
           file: { fileName: zipFileName, code },
         });
@@ -45,24 +47,12 @@ const downloadFiles = (req, res) => {
   if (file?.fileName) {
     const filePath = path + file.fileName;
     if (fs.existsSync(filePath)) {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send("An error occurred while reading the file.");
-        } else {
-          res.setHeader("Content-Type", "application/zip");
-          res.setHeader(
-            "Content-Disposition",
-            "attachment; filename=" + file.fileName
-          );
-          res.send(data);
-        }
-      });
+      res.download(filePath);
     } else {
-      res.status(404).send("File not found.");
+      res.status(404).send({ success: false, message: "File not found." });
     }
   } else {
-    return res.send({ message: "Invalid code" });
+    return res.status(500).send({ success: false, message: "Invalid code" });
   }
 };
 

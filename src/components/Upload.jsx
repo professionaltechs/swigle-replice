@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 
 // STYLES
 import "../styles/upload.css";
@@ -8,21 +7,25 @@ import "../styles/upload.css";
 import laptop from "../images/laptop.jpg";
 
 // ICONS
-import { MdOutlineCloudUpload, MdOutlineDelete } from "react-icons/md";
+import { MdOutlineDelete } from "react-icons/md";
 import { GoFileDirectory } from "react-icons/go";
-import { BiMessageAltCheck } from "react-icons/bi";
 import { CiLink, CiMail } from "react-icons/ci";
-import { CiFileOn } from "react-icons/ci";
+
+// AXIOS
+import { uploadFile, downloadFile } from "../axios/axios";
+
+import { toast } from "react-toastify";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const Upload = () => {
-  // const onDrop = useCallback((acceptedFiles) => {
-  // }, []);
-  // const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
   // STATES
   const [send, setSend] = useState(false);
   const [recieve, setRecieve] = useState(false);
   const [files, setFiles] = useState([]);
+  const [code, setCode] = useState(0);
+
+  const [progress, setProgress] = useState(0);
+  const [uploadingStatus, setUploadingStatus] = useState(false);
 
   // ANIMATION FUNCTIONS
   const handleSend = (option) => {
@@ -51,11 +54,9 @@ const Upload = () => {
 
   // FILE HANDLING
   const handleUploadedFiles = (uploadedFile) => {
-    const data = new FormData();
-    [...uploadedFile].forEach((file, i) => {
-      data.append(`file-${i}`, file, file.name);
-    });
-    return data;
+    setCode(0);
+    const allFiles = [...files, ...uploadedFile];
+    setFiles(allFiles);
   };
 
   const removeUploadedFile = (index) => {
@@ -64,36 +65,53 @@ const Upload = () => {
     setFiles(newFiles);
   };
 
-  useEffect(() => {
-    if (files.length) {
-      const uploadedFiles = handleUploadedFiles(files);
+  // API FUNCTIONS
+  const sendFile = async () => {
+    setUploadingStatus(true)
+    const data = new FormData();
+    files.forEach((file, i) => {
+      data.append(`files`, file);
+    });
+    const response = await uploadFile.post("/", data, {
+      onUploadProgress: (progressEvent) => {
+        const progress = (progressEvent.loaded / progressEvent.total) * 50;
+        setProgress(progress);
+      },
+      onDownloadProgress: (progressEvent) => {
+        const progress = 50 + (progressEvent.loaded / progressEvent.total) * 50;
+        console.log(progress);
+        setProgress(progress);
+      },
+    });
+    if (response?.data?.success) {
+      setCode(response?.data?.file?.code);
+      setFiles([]);
+      setUploadingStatus(false)
+      setProgress(0);
+      return toast.success("File uploaded successfully!");
     }
-  }, [files, files.length]);
+    toast.error("Error occured. Please try again!");
+    setUploadingStatus(false)
+    setProgress(0);
+  };
+
+  const recieveFile = async () => {
+    const response = await downloadFile.get(`/${code}`);
+    if (!response?.data?.success) {
+      return toast.error(response?.data?.message);
+    }
+    const href = URL.createObjectURL(response?.data);
+    const link = document.createElement("a");
+    link.href = href;
+    link.setAttribute("download", "file.zip");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+  };
 
   return (
     <>
-      {/* <div className="uploadMain">
-        <div className="uploadContainer">
-          <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            {isDragActive ? (
-              <p>Drop the files here ...</p>
-            ) : (
-              <div className="uploadInner">
-                <div className="rotatingBorder"></div>
-                <MdOutlineCloudUpload className="uploadIcon" />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="uploadIntro">
-          <h4 className="uploadIntroHeading">Enjoy seamless file transfers online, free from worries about performance or costs.</h4>
-          <div className="uploadIntroInput">
-            <input type="text" placeholder="Enter your E-mail" className="uploadIntroEmail"/>
-            <button className="btn btn-primary uploadIntroSingUp">Sign up</button>
-          </div>
-        </div>
-      </div> */}
       <div className="uploadSection container">
         <div className="uploadSectionInner">
           <div className="uploadSectionImageSection">
@@ -152,7 +170,159 @@ const Upload = () => {
               <div className="uploadSectionContentInner">
                 <h3 className="uploadSectionContentInnerHeading">Files</h3>
                 <hr />
-                <div className="uploadedFiles">
+                <div className={`uploadedFiles ${code ? "fileCode" : ""}`}>
+                  {code ? (
+                    <>
+                      <h5>Code</h5>
+                      <h1>{code}</h1>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className="uploadedFilesInner"
+                        style={{ flexGrow: "1" }}
+                      >
+                        {[...files]?.map((file, index) => {
+                          return (
+                            <div className="uploadedFilesList" key={index}>
+                              <div className="uploadedFileDetails">
+                                {file.name}
+                              </div>
+                              <div
+                                style={{
+                                  textAlign: "center",
+                                  color: "#E74C3C",
+                                }}
+                              >
+                                <MdOutlineDelete
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => removeUploadedFile(index)}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="uploadedFilesType">
+                        <hr style={{ marginTop: "0px" }} />
+                        <div className="directLinkEmail">
+                          <span
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <GoFileDirectory
+                              style={{ marginRight: "5px", fontSize: "18px" }}
+                            />
+                            Direct
+                          </span>
+                          <span
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <CiLink
+                              style={{ marginRight: "5px", fontSize: "18px" }}
+                            />
+                            Link
+                          </span>
+                          <span
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <CiMail
+                              style={{ marginRight: "5px", fontSize: "18px" }}
+                            />
+                            E-mail
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="uploadFileButtonContainer">
+                  <label
+                    htmlFor="inpuFile"
+                    className="btn btn-primary uploadFileButton"
+                  >
+                    Upload File
+                  </label>
+                  <input
+                    id="inpuFile"
+                    type="file"
+                    multiple
+                    onChange={(e) => handleUploadedFiles(e.target.files)}
+                    style={{ display: "none" }}
+                  />
+                  <button
+                    onClick={sendFile}
+                    className="btn btn-success uploadFileButton"
+                    disabled={code}
+                  >
+                    Send
+                  </button>
+                </div>
+                <LinearProgress
+                  variant="determinate"
+                  className={`progressBar ${
+                    uploadingStatus ? "progressBarActive" : ""
+                  }`}
+                  value={progress}
+                />
+              </div>
+            )}
+            {recieve && (
+              <div
+                className="uploadSectionContentInner"
+                style={{
+                  border: "1px solid #000000",
+                  paddingLeft: "5px",
+                  paddingRight: "5px",
+                  borderRadius: "10px",
+                  background: "#171717",
+                  color: "white",
+                }}
+              >
+                <div style={{ marginTop: "auto", marginBottom: "auto" }}>
+                  <h3 className="uploadSectionContentInnerHeading">Recieve</h3>
+                  <input
+                    type="text"
+                    placeholder="Input key"
+                    className="inputKey"
+                  />
+                  <div className="uploadFileButtonContainer">
+                    <button
+                      className="btn btn-success uploadFileButton"
+                      onClick={recieveFile}
+                    >
+                      Download
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="uploadSectionContentMobile">
+          <div className="uploadSectionContentInner">
+            <h3 className="uploadSectionContentInnerHeading">Files</h3>
+            <hr />
+            <div className={`uploadedFiles ${code ? "fileCode" : ""}`}>
+              {code ? (
+                <>
+                  <h5>Code</h5>
+                  <h1>{code}</h1>
+                </>
+              ) : (
+                <>
                   <div className="uploadedFilesInner" style={{ flexGrow: "1" }}>
                     {[...files]?.map((file, index) => {
                       return (
@@ -211,77 +381,8 @@ const Upload = () => {
                       </span>
                     </div>
                   </div>
-                </div>
-                <div className="uploadFileButtonContainer">
-                  <label
-                    htmlFor="inpuFile"
-                    className="btn btn-primary uploadFileButton"
-                  >
-                    Upload File
-                  </label>
-                  <input
-                    id="inpuFile"
-                    type="file"
-                    multiple
-                    onChange={(e) => setFiles(e.target.files)}
-                    style={{ display: "none" }}
-                  />
-                  <button className="btn btn-success uploadFileButton">
-                    Send
-                  </button>
-                </div>
-              </div>
-            )}
-            {recieve && (
-              <div
-                className="uploadSectionContentInner"
-                style={{
-                  border: "1px solid #000000",
-                  paddingLeft: "5px",
-                  paddingRight: "5px",
-                  borderRadius: "10px",
-                  background: "#171717",
-                  color: "white",
-                }}
-              >
-                <div style={{ marginTop: "auto", marginBottom: "auto" }}>
-                  <h3 className="uploadSectionContentInnerHeading">Recieve</h3>
-                  <input
-                    type="text"
-                    placeholder="Input key"
-                    className="inputKey"
-                  />
-                  <div className="uploadFileButtonContainer">
-                    <button className="btn btn-success uploadFileButton">
-                      Download
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="uploadSectionContentMobile">
-          <div className="uploadSectionContentInner">
-            <h3 className="uploadSectionContentInnerHeading">Files</h3>
-            <hr />
-            <div className="uploadedFiles">
-              <div className="uploadedFilesInner" style={{ flexGrow: "1" }}>
-                {[...files]?.map((file, index) => {
-                  return (
-                    <div className="uploadedFilesList" key={index}>
-                      <div className="uploadedFileDetails">{file.name}</div>
-                      <div style={{ textAlign: "center", color: "#E74C3C" }}>
-                        <MdOutlineDelete
-                          style={{ cursor: "pointer" }}
-                          onClick={() => removeUploadedFile(index)}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                </>
+              )}
             </div>
             <div className="uploadFileButtonContainer">
               <label
@@ -295,8 +396,15 @@ const Upload = () => {
                 type="file"
                 multiple
                 style={{ display: "none" }}
+                onChange={(e) => handleUploadedFiles(e.target.files)}
               />
-              <button className="btn btn-success uploadFileButton">Send</button>
+              <button
+                className="btn btn-success uploadFileButton"
+                onClick={sendFile}
+                disabled={code}
+              >
+                Send
+              </button>
             </div>
           </div>
           <div className="uploadSectionContentInner">
@@ -305,7 +413,10 @@ const Upload = () => {
               <hr />
               <input type="text" placeholder="Input key" className="inputKey" />
               <div className="uploadFileButtonContainer">
-                <button className="btn btn-success uploadFileButton">
+                <button
+                  className="btn btn-success uploadFileButton"
+                  onClick={recieveFile}
+                >
                   Download
                 </button>
               </div>
