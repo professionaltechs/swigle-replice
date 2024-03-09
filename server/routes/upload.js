@@ -1,15 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-// CONTROLLER
+// CONTROLLERS
 const { uploadFiles, downloadFiles } = require("../controllers/upload");
 
-// MULTER
-const upload = require("../config/multer");
-
-router.post("/uploadFiles", 
-// upload, 
-uploadFiles);
+// ROUTES
+router.post("/uploadFiles", uploadFiles);
 
 router.get("/download/:code", downloadFiles);
 

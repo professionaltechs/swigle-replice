@@ -23,6 +23,7 @@ const Upload = () => {
   const [recieve, setRecieve] = useState(false);
   const [files, setFiles] = useState([]);
   const [code, setCode] = useState(0);
+  const [downloadCode, setDownloadCode] = useState(0);
 
   const [progress, setProgress] = useState(0);
   const [uploadingStatus, setUploadingStatus] = useState(false);
@@ -95,11 +96,11 @@ const Upload = () => {
   };
 
   const recieveFile = async () => {
-    const response = await downloadFile.get(`/${code}`);
-    if (!response?.status === 200) {
-      return toast.error("Something went wrong");
+    const response = await downloadFile.request(`/${downloadCode}`);
+    if (response.headers['content-type'] === 'application/json; charset=utf-8') {
+      return toast.error('Invalid Code');
     }
-    const href = URL.createObjectURL(response?.data);
+    const href = URL.createObjectURL(new Blob([response?.data]));
     const link = document.createElement("a");
     link.href = href;
     link.setAttribute("download", "file.zip");
@@ -292,9 +293,10 @@ const Upload = () => {
                 <div style={{ marginTop: "auto", marginBottom: "auto" }}>
                   <h3 className="uploadSectionContentInnerHeading">Recieve</h3>
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Input key"
                     className="inputKey"
+                    onChange={(e) => setDownloadCode(e.target.value)}
                   />
                   <div className="uploadFileButtonContainer">
                     <button
@@ -410,7 +412,12 @@ const Upload = () => {
             <div style={{ marginTop: "auto", marginBottom: "auto" }}>
               <h3 className="uploadSectionContentInnerHeading">Recieve</h3>
               <hr />
-              <input type="text" placeholder="Input key" className="inputKey" />
+              <input
+                type="text"
+                placeholder="Input key"
+                className="inputKey"
+                onChange={(e) => setDownloadCode(e.target.value)}
+              />
               <div className="uploadFileButtonContainer">
                 <button
                   className="btn btn-success uploadFileButton"
