@@ -1,6 +1,6 @@
 const fs = require("fs");
 const upload = require("../config/multer");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
 // HELPERS
 const {
@@ -26,7 +26,7 @@ const uploadFiles = (req, res) => {
       .then(async (zipFileName) => {
         const fileNames = req.files.map((file) => file.filename);
         deleteTempFiles(fileNames);
-        const code = uuidv4().substring(0, 6)
+        const code = uuidv4().substring(0, 6);
         const fileData = new fileRecord({
           fileName: zipFileName,
           fileCode: code,
@@ -55,7 +55,33 @@ const downloadFiles = async (req, res) => {
   if (file?.fileName) {
     const filePath = path + file.fileName;
     if (fs.existsSync(filePath)) {
-      res.download(filePath);
+      // res.download(filePath);
+      const fileSize = fs.statSync(filePath).size;
+      const readStream = fs.createReadStream(filePath);
+
+      res.set({
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${file.fileName}"`,
+        "Content-Length": fileSize,
+      });
+
+      let bytesSent = 0;
+
+      readStream.on("data", (chunk) => {
+        bytesSent += chunk.length;
+        const progress = (bytesSent / fileSize) * 100;
+        res.write(chunk);
+      });
+
+      readStream.on("end", () => {
+        res.end();
+      });
+      readStream.on("error", (err) => {
+        console.error("Error streaming file:", err);
+        res
+          .status(500)
+          .send({ success: false, message: "Error streaming file" });
+      });
     } else {
       res.status(200).send({ success: false, message: "File not found." });
     }

@@ -25,10 +25,13 @@ const Upload = () => {
   const [code, setCode] = useState(0);
   const [downloadCode, setDownloadCode] = useState(0);
   const [codeExpired, setCodeExpired] = useState(0);
+  const [codeStartTime, setCodeStartTime] = useState(0);
+  const [codeDuration, setCodeDuration] = useState(0);
   const [intervalId, setIntervalId] = useState(null);
 
   const [progress, setProgress] = useState(0);
   const [uploadingStatus, setUploadingStatus] = useState(false);
+  const [downloadProgess, setDownloadProgress] = useState(0);
 
   // ANIMATION FUNCTIONS
   const handleSend = (option) => {
@@ -77,17 +80,23 @@ const Upload = () => {
     });
     const response = await uploadFile.post("/", data, {
       onUploadProgress: (progressEvent) => {
-        const progress = (progressEvent.loaded / progressEvent.total) * 50;
+        const progress = (progressEvent.loaded / progressEvent.total) * 99;
         setProgress(progress);
       },
       onDownloadProgress: (progressEvent) => {
-        const progress = 50 + (progressEvent.loaded / progressEvent.total) * 50;
+        const progress = 50 + (progressEvent.loaded / progressEvent.total) * 1;
         setProgress(progress);
       },
     });
     if (response?.data?.success) {
+      setCodeStartTime(Date.now() / 1000);
+      setCodeDuration(300); // COUNTDOWN IN SECONDS
+      const startTime = Date.now() / 1000;
+      const duration = 300;
       setCodeExpired(300);
-      const id = setInterval(timer, 1000);
+      const id = setInterval(function () {
+        countDown(startTime, duration);
+      }, 1000);
       setIntervalId(id);
       setCode(response?.data?.file?.code);
       setFiles([]);
@@ -101,7 +110,14 @@ const Upload = () => {
   };
 
   const recieveFile = async () => {
-    const response = await downloadFile.request(`/${downloadCode}`);
+    const response = await downloadFile.get(`/${downloadCode}`, {
+      onDownloadProgress: (progressEvent) => {
+        let progress = Math.round(
+          (progressEvent.loaded / progressEvent.total) * 100
+        );
+        setDownloadProgress(progress);
+      },
+    });
     if (
       response.headers["content-type"] === "application/json; charset=utf-8"
     ) {
@@ -118,9 +134,21 @@ const Upload = () => {
   };
 
   // STATE FUNCTIONS
-  const timer = () => {
-    setCodeExpired((prev) => prev - 1);
+  const countDown = (startTime, duration) => {
+    const curentTime = Date.now() / 1000;
+    const elapsedTime = Math.floor(curentTime - startTime);
+    setCodeExpired((prev) => duration - elapsedTime);
   };
+
+  const adjustCountDown = () => {
+    const curentTime = Date.now() / 1000;
+    const elapsedTime = Math.floor(curentTime - codeStartTime);
+    setCodeExpired((prev) => codeDuration - elapsedTime);
+  };
+
+  useEffect(() => {
+    document.addEventListener("visibilitychange", adjustCountDown);
+  }, []);
 
   useEffect(() => {
     if (codeExpired === 0) {
@@ -129,6 +157,12 @@ const Upload = () => {
       clearInterval(intervalId);
     }
   }, [codeExpired, intervalId]);
+
+  useEffect(() => {
+    if (downloadProgess == 100) {
+      setDownloadProgress(0);
+    }
+  }, [downloadProgess]);
 
   return (
     <>
@@ -335,6 +369,13 @@ const Upload = () => {
                       Download
                     </button>
                   </div>
+                  <LinearProgress
+                    variant="determinate"
+                    className={`progressBar ${
+                      downloadProgess !== 0 ? "progressBarActive" : ""
+                    }`}
+                    value={downloadProgess}
+                  />
                 </div>
               </div>
             )}

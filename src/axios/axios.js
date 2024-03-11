@@ -11,9 +11,15 @@ const uploadFile = axios.create({
 
 const downloadFile = axios.create({
   baseURL: url + "/files/download",
-  responseType: 'blob',
+  responseType: "blob",
   headers: {
     "Content-Type": "multipart/form-data",
+  },
+  onDownloadProgress: (progressEvent) => {
+    let progress = Math.round(
+      (progressEvent.loaded / progressEvent.total) * 100
+    );
+    console.log(`Download progress: ${progress}%`);
   },
 });
 

@@ -173,6 +173,7 @@
   max-height: 100vh;
   position: relative;
   display: flex;
+  gap: 20px;
 }
 
 .uploadSectionImageSection {
@@ -282,6 +283,7 @@
   margin-right: auto;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .uploadSectionContentInnerHeading {
@@ -409,8 +411,12 @@
     font-size: 12px;
   }
 
-  .uploadedFiles {
-    max-height: 230px;
+  .uploadSectionInner {
+    align-items: center;
+  }
+
+  .uploadSectionContent {
+    height: 400px;
   }
 }
 
@@ -440,6 +446,28 @@
 
   .directLinkEmail {
     gap: 20px;
+  }
+
+  .uploadSectionImageSectionOptionsSend {
+    left: 16%;
+    bottom: 42%;
+  }
+
+  .uploadSectionImageSectionOptionsRecieve  {
+    right: 20%;
+    bottom: 42%;
+  }
+
+  h3 {
+    font-size: 21px;
+  }
+
+  p, span, li {
+    font-size: 14px;
+  }
+  
+  .btn {
+    font-size: 14px !important;
   }
 }
 
@@ -491,5 +519,11 @@
 
   .uploadSectionContentMobile {
     gap: 70px;
+  }
+}
+
+@media(min-width: 1400px) {
+  .uploadSection  {
+    max-width: 1500px !important;
   }
 }
