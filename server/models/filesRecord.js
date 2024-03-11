@@ -8,18 +8,10 @@ const fileRecordSchema = new Schema({
     required: true,
   },
   fileCode: {
-    type: Number,
+    type: String,
     required: true,
   },
-  deleteDocument: {
-    type: Date,
-  },
 });
-
-// fileRecordSchema.index(
-//   { deleteDocument: 1 },
-//   { expireAfterSeconds: 10 }
-// );
 
 const fileRecord = mongoose.model("fileRecord", fileRecordSchema);
 

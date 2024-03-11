@@ -2,7 +2,7 @@ const fs = require("fs");
 const archiver = require("archiver");
 const rimraf = require("rimraf");
 const uploadFolder = require("../uploads/details");
-const { deleteFilesAfterSeconds } = require("../uploads/details");
+const fileRecord = require("../models/filesRecord");
 
 function createZip(files) {
   return new Promise((resolve, reject) => {
@@ -43,23 +43,24 @@ const deleteTempFiles = (files) => {
   }
 };
 
-// const deleteUploadedFiles = (file) => {
-//   const filePath = uploadFolder + file;
-//   if (filePath) {
-//     setTimeout(() => {
-//       fs.unlink(filePath, (err) => {
-//         if (err) {
-//           console.error("Error deleting file:", err);
-//         } else {
-//           console.log("File deleted successfully after 10 seconds");
-//         }
-//       });
-//     }, 1000 * 10);
-//   }
-// };
+const deleteUploadedFiles = (file, code) => {
+  const filePath = uploadFolder + file;
+  if (filePath) {
+    setTimeout(() => {
+      fs.unlink(filePath, async (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          await fileRecord.deleteOne({ fileCode: code });
+          console.log("File deleted successfully");
+        }
+      });
+    }, 1000 * 60 * 5);
+  }
+};
 
 module.exports = {
   createZip,
   deleteTempFiles,
-  //  deleteUploadedFiles
+  deleteUploadedFiles,
 };

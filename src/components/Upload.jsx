@@ -24,6 +24,8 @@ const Upload = () => {
   const [files, setFiles] = useState([]);
   const [code, setCode] = useState(0);
   const [downloadCode, setDownloadCode] = useState(0);
+  const [codeExpired, setCodeExpired] = useState(0);
+  const [intervalId, setIntervalId] = useState(null);
 
   const [progress, setProgress] = useState(0);
   const [uploadingStatus, setUploadingStatus] = useState(false);
@@ -84,6 +86,9 @@ const Upload = () => {
       },
     });
     if (response?.data?.success) {
+      setCodeExpired(300);
+      const id = setInterval(timer, 1000);
+      setIntervalId(id);
       setCode(response?.data?.file?.code);
       setFiles([]);
       setUploadingStatus(false);
@@ -97,8 +102,10 @@ const Upload = () => {
 
   const recieveFile = async () => {
     const response = await downloadFile.request(`/${downloadCode}`);
-    if (response.headers['content-type'] === 'application/json; charset=utf-8') {
-      return toast.error('Invalid Code');
+    if (
+      response.headers["content-type"] === "application/json; charset=utf-8"
+    ) {
+      return toast.error("Invalid Code");
     }
     const href = URL.createObjectURL(new Blob([response?.data]));
     const link = document.createElement("a");
@@ -109,6 +116,19 @@ const Upload = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
+
+  // STATE FUNCTIONS
+  const timer = () => {
+    setCodeExpired((prev) => prev - 1);
+  };
+
+  useEffect(() => {
+    if (codeExpired === 0) {
+      setCode(0);
+      setCodeExpired(0);
+      clearInterval(intervalId);
+    }
+  }, [codeExpired, intervalId]);
 
   return (
     <>
@@ -175,6 +195,15 @@ const Upload = () => {
                     <>
                       <h5>Code</h5>
                       <h1>{code}</h1>
+                      <p>
+                        Expires in{" "}
+                        <span style={{ color: "#E74C3C" }}>
+                          {parseInt(codeExpired / 60)}m
+                        </span>{" "}
+                        <span style={{ color: "#E74C3C" }}>
+                          {codeExpired % 60}s
+                        </span>
+                      </p>
                     </>
                   ) : (
                     <>
@@ -293,7 +322,7 @@ const Upload = () => {
                 <div style={{ marginTop: "auto", marginBottom: "auto" }}>
                   <h3 className="uploadSectionContentInnerHeading">Recieve</h3>
                   <input
-                    type="number"
+                    type="text"
                     placeholder="Input key"
                     className="inputKey"
                     onChange={(e) => setDownloadCode(e.target.value)}
@@ -321,6 +350,15 @@ const Upload = () => {
                 <>
                   <h5>Code</h5>
                   <h1>{code}</h1>
+                  <p>
+                    Expires in{" "}
+                    <span style={{ color: "#E74C3C" }}>
+                      {parseInt(codeExpired / 60)}m
+                    </span>{" "}
+                    <span style={{ color: "#E74C3C" }}>
+                      {codeExpired % 60}s
+                    </span>
+                  </p>
                 </>
               ) : (
                 <>

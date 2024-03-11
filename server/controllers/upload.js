@@ -1,12 +1,12 @@
 const fs = require("fs");
 const upload = require("../config/multer");
-const formidable = require("formidable");
+const { v4: uuidv4 } = require('uuid');
 
 // HELPERS
 const {
   createZip,
   deleteTempFiles,
-  // deleteUploadedFiles,
+  deleteUploadedFiles,
 } = require("../helpers/upload");
 
 // UPLOAD FOLDER LOCATION
@@ -26,14 +26,14 @@ const uploadFiles = (req, res) => {
       .then(async (zipFileName) => {
         const fileNames = req.files.map((file) => file.filename);
         deleteTempFiles(fileNames);
-        const code = Math.floor(100000 + Math.random() * 900000);
+        const code = uuidv4().substring(0, 6)
         const fileData = new fileRecord({
           fileName: zipFileName,
           fileCode: code,
           deleteDocument: new Date(),
         });
         await fileData.save();
-        // deleteUploadedFiles(zipFileName);
+        deleteUploadedFiles(zipFileName, code);
         res.send({
           success: true,
           message: "Files uploaded successfully.",
