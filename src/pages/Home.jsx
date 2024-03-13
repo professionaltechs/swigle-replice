@@ -19,11 +19,11 @@ const Home = () => {
         <Upload />
       </div>
       {/* <Features /> */}
-      <Attributes/>
+      <Attributes />
       <Pricing />
       <Contact />
     </>
   );
 };
 
-export default Home;  
+export default Home;

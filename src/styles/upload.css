@@ -267,10 +267,6 @@
 }
 
 .uploadSectionImageSectionChangeOption {
-  /* position: absolute;
-  bottom: -30px;
-  left: 0;
-  right: 0; */
   width: fit-content;
   margin: 0px auto;
 }
@@ -389,6 +385,29 @@
 
 .progressBarActive {
   opacity: 1;
+}
+
+.activeTransferType {
+  background-color: #212121;
+  color: white;
+  border-radius: 10px;
+  transition: all 300ms;
+}
+
+.uploadedFileDetails {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.downloadIcon {
+  color: #71A0FA;
+  font-weight: 700;
+}
+
+.downloadIcon:hover {
+  color: #4675CD;
 }
 
 @keyframes Rotate {

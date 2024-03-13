@@ -4,6 +4,10 @@ const rimraf = require("rimraf");
 const uploadFolder = require("../uploads/details");
 const fileRecord = require("../models/filesRecord");
 
+// UPLOAD FOLDER LOCATION
+const path = require("../uploads/details");
+const { deleteTime } = require("../uploads/details");
+
 function createZip(files) {
   return new Promise((resolve, reject) => {
     const zipName = Date.now().valueOf();
@@ -21,6 +25,10 @@ function createZip(files) {
       resolve(zipName + ".zip");
     });
 
+    archive.on('progress', (progress) => {
+      console.log(`Progress: ${progress.entries.processed}/${progress.entries.total} files processed`);
+  });
+
     archive.on("error", (err) => {
       reject(err);
     });
@@ -28,8 +36,8 @@ function createZip(files) {
     archive.pipe(output);
 
     files.forEach((file) => {
-      archive.append(fs.createReadStream(file.path), {
-        name: file.originalname,
+      archive.append(fs.createReadStream(path + file), {
+        name: file,
       });
     });
 
@@ -44,19 +52,21 @@ const deleteTempFiles = (files) => {
 };
 
 const deleteUploadedFiles = (file, code) => {
-  const filePath = uploadFolder + file;
-  if (filePath) {
-    setTimeout(() => {
-      fs.unlink(filePath, async (err) => {
-        if (err) {
-          console.error("Error deleting file:", err);
-        } else {
-          await fileRecord.deleteOne({ fileCode: code });
-          console.log("File deleted successfully");
-        }
-      });
-    }, 1000 * 60 * 5);
-  }
+  setTimeout(async () => {
+    file?.map((file) => {
+      const filePath = uploadFolder + file;
+      if (filePath) {
+        fs.unlink(filePath, async (err) => {
+          if (err) {
+            console.error("Error deleting file:", err);
+          } else {
+            console.log("File deleted successfully");
+          }
+        });
+      }
+    });
+    await fileRecord.deleteOne({ fileCode: code });
+  }, 1000 * 60 * 5);
 };
 
 module.exports = {

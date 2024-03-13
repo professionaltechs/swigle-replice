@@ -4,13 +4,17 @@ const { deleteFilesAfterSeconds } = require("../uploads/details");
 
 const fileRecordSchema = new Schema({
   fileName: {
-    type: String,
-    required: true,
+    type: Array,
+    default: [],
   },
   fileCode: {
     type: String,
     required: true,
   },
+  isLink : {
+    type : Boolean,
+    required : true,
+  }
 });
 
 const fileRecord = mongoose.model("fileRecord", fileRecordSchema);
