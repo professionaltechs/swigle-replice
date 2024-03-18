@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { deleteFilesAfterSeconds } = require("../uploads/details");
 
 const fileRecordSchema = new Schema({
   fileName: {

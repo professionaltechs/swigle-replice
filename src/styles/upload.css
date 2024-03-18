@@ -242,7 +242,6 @@
   transition: all 300ms;
 }
 
-
 .uploadSectionImageSectionOptionsSend:hover .rotatingBorder {
   border: 4px dashed #2d3250;
   animation: Rotate 10s linear infinite;
@@ -288,8 +287,8 @@
 
 .uploadedFiles {
   flex-grow: 1;
-  border: solid 1px #C1C1C1;
-  background-color: #F1F1F1;
+  border: solid 1px #c1c1c1;
+  background-color: #f1f1f1;
   overflow-y: auto;
   border-radius: 10px;
   max-height: 350px;
@@ -339,7 +338,7 @@
   max-width: 300px;
   padding: 10px 20px;
   border-radius: 10px;
-  border: solid 1px #E1E6E8;
+  border: solid 1px #e1e6e8;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -362,13 +361,13 @@
   margin-bottom: 5px;
   position: sticky;
   bottom: 0px;
-  background-color: #F1F1F1;
+  background-color: #f1f1f1;
   margin-bottom: 0px;
 }
 
 .directLinkEmail {
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   gap: 40px;
   padding-bottom: 10px;
 }
@@ -377,7 +376,7 @@
   width: 200px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
+  margin-top: 7px;
   pointer-events: none;
   opacity: 0;
   transition: all 200ms;
@@ -388,9 +387,7 @@
 }
 
 .activeTransferType {
-  background-color: #212121;
-  color: white;
-  border-radius: 10px;
+  border-bottom: solid 1px #0D6EFD;
   transition: all 300ms;
 }
 
@@ -402,12 +399,40 @@
 }
 
 .downloadIcon {
-  color: #71A0FA;
+  color: #71a0fa;
   font-weight: 700;
 }
 
 .downloadIcon:hover {
-  color: #4675CD;
+  color: #4675cd;
+}
+
+.statusContainerAnimated {
+  height: 0px;
+  overflow: hidden;
+  transition: all 400ms;
+}
+
+.statusContainer {
+  padding-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status {
+  font-size: 10px;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.opacity0 {
+  opacity: 0;
+  transition: all 200ms;
+}
+
+.opacity1 {
+  opacity: 1 !important;
 }
 
 @keyframes Rotate {
@@ -472,7 +497,7 @@
     bottom: 42%;
   }
 
-  .uploadSectionImageSectionOptionsRecieve  {
+  .uploadSectionImageSectionOptionsRecieve {
     right: 20%;
     bottom: 42%;
   }
@@ -481,17 +506,21 @@
     font-size: 21px;
   }
 
-  p, span, li {
+  p,
+  span,
+  li {
     font-size: 14px;
   }
-  
+
   .btn {
     font-size: 14px !important;
   }
 }
 
-@media(max-width: 767px) {
-  .uploadSectionImageSectionOptions, .uploadSectionImageSectionChangeOption, .uploadSectionContent{
+@media (max-width: 767px) {
+  .uploadSectionImageSectionOptions,
+  .uploadSectionImageSectionChangeOption,
+  .uploadSectionContent {
     display: none;
   }
 
@@ -525,10 +554,14 @@
   .uploadFileButtonContainer {
     margin-top: 20px;
   }
+
+  .specificTransferType {
+    padding-bottom: 5px;
+  }
 }
 
-@media(max-width: 530px) {
-  .uploadSection  {
+@media (max-width: 530px) {
+  .uploadSection {
     padding-top: 125px;
   }
 
@@ -541,8 +574,8 @@
   }
 }
 
-@media(min-width: 1400px) {
-  .uploadSection  {
+@media (min-width: 1400px) {
+  .uploadSection {
     max-width: 1500px !important;
   }
 }

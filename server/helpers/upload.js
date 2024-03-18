@@ -1,12 +1,20 @@
 const fs = require("fs");
 const archiver = require("archiver");
 const rimraf = require("rimraf");
-const uploadFolder = require("../uploads/details");
 const fileRecord = require("../models/filesRecord");
+const WebSocket = require("ws");
+const wss = new WebSocket.Server({ port: 8081 });
 
 // UPLOAD FOLDER LOCATION
-const path = require("../uploads/details");
-const { deleteTime } = require("../uploads/details");
+const { uploadFilesLocation } = require("../uploads/details");
+
+const sendProgressUpdate = (progress) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(progress));
+    }
+  });
+};
 
 function createZip(files) {
   return new Promise((resolve, reject) => {
@@ -25,9 +33,12 @@ function createZip(files) {
       resolve(zipName + ".zip");
     });
 
-    archive.on('progress', (progress) => {
-      console.log(`Progress: ${progress.entries.processed}/${progress.entries.total} files processed`);
-  });
+    archive.on("progress", (progress) => {
+      console.log(
+        `Progress: ${progress.entries.processed}/${progress.entries.total} files processed`
+      );
+      sendProgressUpdate(progress);
+    });
 
     archive.on("error", (err) => {
       reject(err);
@@ -36,7 +47,7 @@ function createZip(files) {
     archive.pipe(output);
 
     files.forEach((file) => {
-      archive.append(fs.createReadStream(path + file), {
+      archive.append(fs.createReadStream(uploadFilesLocation + file), {
         name: file,
       });
     });
@@ -54,7 +65,7 @@ const deleteTempFiles = (files) => {
 const deleteUploadedFiles = (file, code) => {
   setTimeout(async () => {
     file?.map((file) => {
-      const filePath = uploadFolder + file;
+      const filePath = uploadFilesLocation + file;
       if (filePath) {
         fs.unlink(filePath, async (err) => {
           if (err) {
