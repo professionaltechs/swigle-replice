@@ -51,18 +51,11 @@ function createZip(files) {
         name: file,
       });
     });
-
     archive.finalize();
   });
 }
 
-const deleteTempFiles = (files) => {
-  for (let i = 0; i < files.length; i++) {
-    rimraf.sync(`uploads/tmp/${files[i]}`);
-  }
-};
-
-const deleteUploadedFiles = (file, code) => {
+const deleteUploadedFiles = (file, code, expiryDuration) => {
   setTimeout(async () => {
     file?.map((file) => {
       const filePath = uploadFilesLocation + file;
@@ -77,11 +70,10 @@ const deleteUploadedFiles = (file, code) => {
       }
     });
     await fileRecord.deleteOne({ fileCode: code });
-  }, 1000 * 60 * 5);
+  }, expiryDuration);
 };
 
 module.exports = {
   createZip,
-  deleteTempFiles,
   deleteUploadedFiles,
 };

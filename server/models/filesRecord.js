@@ -6,14 +6,20 @@ const fileRecordSchema = new Schema({
     type: Array,
     default: [],
   },
+  transferredTime: {
+    type: String,
+  },
+  deleteTime : {
+    type: String,
+  },
   fileCode: {
     type: String,
     required: true,
   },
-  isLink : {
-    type : Boolean,
-    required : true,
-  }
+  isLink: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const fileRecord = mongoose.model("fileRecord", fileRecordSchema);

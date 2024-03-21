@@ -3,24 +3,42 @@ const upload = require("../config/multer");
 const { v4: uuidv4 } = require("uuid");
 
 // HELPERS
-const {
-  createZip,
-  deleteTempFiles,
-  deleteUploadedFiles,
-} = require("../helpers/upload");
+const { createZip, deleteUploadedFiles } = require("../helpers/upload");
+
+const { tokenVerification } = require("../helpers/auth");
 
 // UPLOAD FOLDER LOCATION
 const { uploadFilesLocation } = require("../uploads/details");
 
 // DB
 const fileRecord = require("../models/filesRecord");
+const guestTransfer = require("../models/guesTransfer");
+const subscription = require("../models/subscription");
+const auth = require("../models/auth");
 const tempDp = require("../db/temp");
 
 // ROUTES
 
 // UPLOAD FILES
 const uploadFiles = (req, res) => {
+  const uploadTime = Date.now();
+  let expiryTime = 1000 * 60 * 1;
+
   upload(req, res, async (err) => {
+    if (req.body.token) {
+      const tokenResponse = await tokenVerification(req.body.token);
+      const subscriptionType = (
+        await auth.findOne(
+          { email: tokenResponse.email },
+          { subscriptionType: 1 }
+        )
+      ).subscriptionType;
+      const subscriptionDetails = await subscription.findOne({
+        subscriptionType,
+      });
+      expiryTime = subscriptionDetails.expiryTime;
+    }
+    const deleteTime = uploadTime + expiryTime;
     const transferType = req.body.transferType;
     if (err) {
       console.error(err);
@@ -30,16 +48,32 @@ const uploadFiles = (req, res) => {
     const code = uuidv4().substring(0, 6);
     const fileData = new fileRecord({
       fileName: fileNames,
+      transferredTime: new Date(uploadTime).toLocaleString(),
+      deleteTime: new Date(deleteTime).toLocaleString(),
       fileCode: code,
       isLink: transferType == 1,
     });
     await fileData.save();
-    deleteUploadedFiles(fileNames, code);
+    deleteUploadedFiles(fileNames, code, expiryTime);
+    const transferId = "id" + uuidv4().substring(0, 16);
+    if (!req.body.token) {
+      const transferData = new guestTransfer({
+        transferNumber: transferId,
+        guestIp: req.ip,
+        transferredAt: new Date(uploadTime).toLocaleString(),
+        expiryAt: new Date(deleteTime).toLocaleString(),
+      });
+    }
+    await transferData.save();
     if (transferType == 0) {
       return res.send({
         success: true,
         message: "Files uploaded successfully.",
-        file: { fileName: fileNames, code },
+        file: {
+          fileName: fileNames,
+          code,
+          expiryTime: new Date(deleteTime).toLocaleString(),
+        },
       });
     } else if (transferType == 1) {
       return res.send({

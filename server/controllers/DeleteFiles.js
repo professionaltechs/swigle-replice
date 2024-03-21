@@ -1,4 +1,5 @@
 const fileRecord = require("../models/filesRecord");
+const guestTransfer = require("../models/guesTransfer");
 const fs = require("fs");
 
 const deleteSpecificFile = async (req, res) => {
@@ -18,20 +19,35 @@ const deleteSpecificFile = async (req, res) => {
 };
 
 const deleteAllFiles = async (req, res) => {
-  const reposnse = await fileRecord.deleteMany({ fileCode: { $exists: true } });
-  const folderPath = __dirname + `/../uploads/`;
-  let zipFiles = [];
-  fs.readdir(folderPath, async (err, files) => {
-    files.forEach((file) => {
-      if (file.includes(".zip")) {
-        zipFiles.push(file);
-      }
+  try {
+    await fileRecord.deleteMany({
+      fileCode: { $exists: true },
     });
-    zipFiles.forEach((zipFile) => {
-      fs.unlinkSync(folderPath + zipFile);
-    });
-  });
-  res.send({ success: true, message: "All files deleted successfully" });
+    res.send({ success: true, message: "All files deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.send({ success: false, message: "Error deleting all files" });
+  }
 };
 
-module.exports = { deleteSpecificFile, deleteAllFiles };
+const deleteGuestTransferRecords = async (req, res) => {
+  try {
+    await guestTransfer.deleteMany({});
+    res.send({
+      success: true,
+      message: "Guest transfer records deleted successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.send({
+      success: false,
+      message: "Error deleting guest transfer records",
+    });
+  }
+};
+
+module.exports = {
+  deleteSpecificFile,
+  deleteAllFiles,
+  deleteGuestTransferRecords,
+};

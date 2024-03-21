@@ -17,6 +17,7 @@ import {
   downloadFile,
   recieveFilesNames,
   getSingleFile,
+  fetchSubscriptionDetails,
 } from "../axios/axios";
 
 import { toast } from "react-toastify";
@@ -33,18 +34,22 @@ const Upload = () => {
   const [recieve, setRecieve] = useState(false);
   const [files, setFiles] = useState([]);
   const [transferType, setTransferType] = useState(0); // 0 = Direct, 1 = Link, 2 = Email
+  const [filesList, setFilesList] = useState([]);
+
+  const [uploadedFilesSize, setUploadedFilesSize] = useState(0);
+  const [uploadSizeLimit, setUploadSizeLimit] = useState();
 
   const [code, setCode] = useState(0);
-  const [codeExpired, setCodeExpired] = useState();
-  const [codeStartTime, setCodeStartTime] = useState(0);
-  const [codeDuration, setCodeDuration] = useState();
-  const [intervalId, setIntervalId] = useState(null);
+  // const [codeExpired, setCodeExpired] = useState();
+  // const [codeStartTime, setCodeStartTime] = useState(0);
+  // const [codeDuration, setCodeDuration] = useState();
+  // const [intervalId, setIntervalId] = useState(null);
   const [downloadCode, setDownloadCode] = useState(0);
+  const [expiryTime, setExpiryTime] = useState();
 
   const [link, setLink] = useState("");
   const [paramCode, setParamCode] = useState();
   const [linkReciever, setLinkReceiver] = useState(false);
-  const [filesList, setFilesList] = useState([]);
 
   const [progress, setProgress] = useState(0);
   const [uploadingStatus, setUploadingStatus] = useState(false);
@@ -59,6 +64,22 @@ const Upload = () => {
     )[0].style.width = "50%";
     document.getElementsByClassName("uploadSectionContent")[0].style.width =
       "50%";
+  };
+
+  const statusAnimation = () => {
+    if (document.getElementsByClassName("statusContainerAnimated").length) {
+      if (downloadingStatus) {
+        const requiredHeight =
+          document.getElementsByClassName("statusContainer")[0].offsetHeight;
+        document.getElementsByClassName(
+          "statusContainerAnimated"
+        )[0].style.height = `${requiredHeight}px`;
+        return;
+      }
+      document.getElementsByClassName(
+        "statusContainerAnimated"
+      )[0].style.height = `0px`;
+    }
   };
 
   // FILE HANDLING
@@ -95,6 +116,10 @@ const Upload = () => {
       data.append(`files`, file);
     });
     data.append("transferType", transferType);
+    const token = localStorage.getItem("token");
+    if (token) {
+      data.append("token", token);
+    }
     const response = await uploadFile.post("/", data, {
       onUploadProgress: (progressEvent) => {
         const progress = (progressEvent.loaded / progressEvent.total) * 99;
@@ -106,15 +131,16 @@ const Upload = () => {
       },
     });
     if (response?.data?.success) {
-      setCodeStartTime(Date.now() / 1000);
-      setCodeDuration(300); // COUNTDOWN IN SECONDS
-      const startTime = Date.now() / 1000;
-      const duration = 300;
-      setCodeExpired(300);
-      const id = setInterval(function () {
-        countDown(startTime, duration);
-      }, 1000);
-      setIntervalId(id);
+      setExpiryTime(response?.data?.file?.expiryTime);
+      // setCodeStartTime(Date.now() / 1000);
+      // setCodeDuration(300);
+      // const startTime = Date.now() / 1000;
+      // const duration = 300;
+      // setCodeExpired(300);
+      // const id = setInterval(function () {
+      //   countDown(startTime, duration);
+      // }, 1000);
+      // setIntervalId(id);
       if (response?.data?.file?.code) {
         setCode(response?.data?.file?.code);
       } else if (response?.data?.file?.link) {
@@ -146,10 +172,8 @@ const Upload = () => {
     ) {
       return toast.error("Invalid Code");
     }
-    console.log(response)
     const blob = new Blob([response.data], { type: "application/zip" });
     const href = URL.createObjectURL(blob);
-    // const href = URL.createObjectURL(new Blob([response?.data]));
     const link = document.createElement("a");
     link.href = href;
     link.setAttribute("download", "file.zip");
@@ -163,6 +187,7 @@ const Upload = () => {
     const response = await recieveFilesNames.get(`/${code}`);
     if (response?.data?.success) {
       setFilesList(response?.data?.filesList);
+      console.log(response?.data?.filesList);
     }
   };
 
@@ -184,6 +209,11 @@ const Upload = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
+  };
+
+  const getSubscriptionDetails = async (subscriptionType) => {
+    const response = await fetchSubscriptionDetails.get(`/${subscriptionType}`);
+    setUploadSizeLimit(response?.data?.subscriptionDetails?.sizePerTransfer);
   };
 
   // STATE FUNCTIONS
@@ -208,34 +238,37 @@ const Upload = () => {
         getFileNames(params?.code);
       }, 500);
     }
+    if (localStorage.getItem('token')) {
+      
+    }
   }, []);
 
-  const countDown = (startTime, duration) => {
-    const curentTime = Date.now() / 1000;
-    const elapsedTime = Math.floor(curentTime - startTime);
-    setCodeExpired(() => duration - elapsedTime);
-  };
+  // const countDown = (startTime, duration) => {
+  //   const curentTime = Date.now() / 1000;
+  //   const elapsedTime = Math.floor(curentTime - startTime);
+  //   setCodeExpired(() => duration - elapsedTime);
+  // };
 
-  const adjustCountDown = () => {
-    const curentTime = Date.now() / 1000;
-    const elapsedTime = Math.floor(curentTime - codeStartTime);
-    setCodeExpired(() => codeDuration - elapsedTime);
-  };
+  // const adjustCountDown = () => {
+  //   const curentTime = Date.now() / 1000;
+  //   const elapsedTime = Math.floor(curentTime - codeStartTime);
+  //   setCodeExpired(() => codeDuration - elapsedTime);
+  // };
 
-  useEffect(() => {
-    document.addEventListener("visibilitychange", adjustCountDown);
-    return () => {
-      document.removeEventListener("visibilitychange", adjustCountDown);
-    };
-  }, [codeDuration]);
+  // useEffect(() => {
+  //   document.addEventListener("visibilitychange", adjustCountDown);
+  //   return () => {
+  //     document.removeEventListener("visibilitychange", adjustCountDown);
+  //   };
+  // }, [codeDuration]);
 
-  useEffect(() => {
-    if (codeExpired <= 0) {
-      setCode(0);
-      setCodeExpired(0);
-      clearInterval(intervalId);
-    }
-  }, [codeExpired, intervalId]);
+  // useEffect(() => {
+  //   if (codeExpired <= 0) {
+  //     setCode(0);
+  //     setCodeExpired(0);
+  //     clearInterval(intervalId);
+  //   }
+  // }, [codeExpired, intervalId]);
 
   useEffect(() => {
     if (downloadProgess == 100) {
@@ -253,28 +286,17 @@ const Upload = () => {
     }
   }, [send, recieve, linkReciever]);
 
-  // useEffect(() => {
-  //   if (creatingZipProgress == 100) {
-  //     setCreatingZipProgress(0);
-  //   }
-  // }, [creatingZipProgress]);
-
   useEffect(() => {
-    if (document.getElementsByClassName("statusContainerAnimated").length) {
-      if (downloadingStatus) {
-        const requiredHeight =
-          document.getElementsByClassName("statusContainer")[0].offsetHeight;
-        document.getElementsByClassName(
-          "statusContainerAnimated"
-        )[0].style.height = `${requiredHeight}px`;
-        return;
-      }
-      document.getElementsByClassName(
-        "statusContainerAnimated"
-      )[0].style.height = `0px`;
+    if (files?.length) {
+      const filesSize = files?.reduce((totalSize, file) => {
+        return totalSize + file.size;
+      }, 0);
+      const sizeInKiloBytes = Math.ceil(filesSize / 1024);
+      setUploadedFilesSize(sizeInKiloBytes);
     }
-  }, [downloadingStatus]);
+  }, [files]);
 
+  useEffect(() => statusAnimation(), [downloadingStatus]);
 
   return (
     <>
@@ -357,13 +379,8 @@ const Upload = () => {
                         </div>
                       )}
                       <p>
-                        Expires in{" "}
-                        <span style={{ color: "#E74C3C" }}>
-                          {parseInt(codeExpired / 60)}m
-                        </span>{" "}
-                        <span style={{ color: "#E74C3C" }}>
-                          {codeExpired % 60}s
-                        </span>
+                        Expires at{" "}
+                        <span style={{ color: "#E74C3C" }}>{expiryTime}</span>
                       </p>
                     </>
                   ) : (
@@ -407,9 +424,9 @@ const Upload = () => {
                                     }}
                                   >
                                     <MdOutlineFileDownload
-                                      onClick={() =>
-                                        downloadSingleFile(fileName)
-                                      }
+                                      onClick={() => {
+                                        downloadSingleFile(fileName);
+                                      }}
                                       className="downloadIcon"
                                       style={{ cursor: "pointer" }}
                                     />
@@ -494,37 +511,82 @@ const Upload = () => {
                         Download Zip
                       </button>
                     </div>
-                    <LinearProgress
-                      variant="determinate"
-                      className={`progressBar ${
-                        downloadProgess !== 0 ? "progressBarActive" : ""
-                      }`}
-                      value={downloadProgess}
-                    />
+
+                    <div style={{ marginTop: "10px" }}>
+                      <p
+                        className={`status opacity0 ${
+                          creatingZipProgress > 0 ? "opacity1" : ""
+                        }`}
+                      >
+                        {creatingZipProgress === 100
+                          ? "Zip Created"
+                          : "Creating Zip"}
+                      </p>
+                      <LinearProgress
+                        variant="determinate"
+                        color="info"
+                        className={`progressBar ${
+                          creatingZipProgress !== 0 ? "progressBarActive" : ""
+                        }`}
+                        value={creatingZipProgress}
+                      />
+                    </div>
+                    <div style={{ marginTop: "7px" }}>
+                      <p
+                        className={`status opacity0 
+                          ${downloadProgess > 0 ? "opacity1" : ""}
+                          `}
+                      >
+                        {downloadProgess == 100 ? "Downloaded" : "Downloading"}
+                      </p>
+                      <LinearProgress
+                        variant="determinate"
+                        className={`progressBar ${
+                          downloadProgess !== 0 ? "progressBarActive" : ""
+                        }`}
+                        value={downloadProgess}
+                      />
+                    </div>
                   </>
                 ) : (
-                  <div className="uploadFileButtonContainer">
-                    <label
-                      htmlFor="inpuFile"
-                      className="btn btn-primary uploadFileButton"
-                    >
-                      Upload File
-                    </label>
-                    <input
-                      id="inpuFile"
-                      type="file"
-                      multiple  
-                      onChange={(e) => handleUploadedFiles(e.target.files)}
-                      style={{ display: "none" }}
-                    />
-                    <button
-                      onClick={sendFile}
-                      className="btn btn-success uploadFileButton"
-                      disabled={code}
-                    >
-                      Send
-                    </button>
-                  </div>
+                  <>
+                    <div className="uploadFileButtonContainer">
+                      <label
+                        htmlFor="inpuFile"
+                        className="btn btn-primary uploadFileButton"
+                      >
+                        Upload File
+                      </label>
+                      <input
+                        id="inpuFile"
+                        type="file"
+                        multiple
+                        onChange={(e) => handleUploadedFiles(e.target.files)}
+                        style={{ display: "none" }}
+                      />
+                      <button
+                        onClick={sendFile}
+                        className="btn btn-success uploadFileButton"
+                        disabled={code || uploadSizeLimit < uploadedFilesSize}
+                      >
+                        Send
+                      </button>
+                    </div>
+                    {uploadSizeLimit < uploadedFilesSize && (
+                      <p
+                        style={{
+                          fontSize: "12px",
+                          color: "#E74C3C",
+                          textAlign: "center",
+                          marginTop: "5px",
+                        }}
+                      >
+                        Upload File Size {Math.round(uploadSizeLimit / 1024)}MB
+                        limit exceeded <br />
+                        uploaded Size {Math.round(uploadedFilesSize / 1024)}MB
+                      </p>
+                    )}
+                  </>
                 )}
                 <LinearProgress
                   variant="determinate"
@@ -566,7 +628,11 @@ const Upload = () => {
                   <div className="statusContainerAnimated">
                     <div className={`statusContainer`}>
                       <div>
-                        <p className={`status opacity0 ${creatingZipProgress > 0 ? 'opacity1' : ''}`}>
+                        <p
+                          className={`status opacity0 ${
+                            creatingZipProgress > 0 ? "opacity1" : ""
+                          }`}
+                        >
                           {creatingZipProgress === 100
                             ? "Zip Created"
                             : "Creating Zip"}
@@ -617,13 +683,8 @@ const Upload = () => {
                   <h5>Code</h5>
                   <h1>{code}</h1>
                   <p>
-                    Expires in{" "}
-                    <span style={{ color: "#E74C3C" }}>
-                      {parseInt(codeExpired / 60)}m
-                    </span>{" "}
-                    <span style={{ color: "#E74C3C" }}>
-                      {codeExpired % 60}s
-                    </span>
+                    Expires at{" "}
+                    <span style={{ color: "#E74C3C" }}>{expiryTime}</span>
                   </p>
                 </>
               ) : (
@@ -729,6 +790,27 @@ const Upload = () => {
                 Send
               </button>
             </div>
+            {uploadSizeLimit < uploadedFilesSize && (
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#E74C3C",
+                  textAlign: "center",
+                  marginTop: "5px",
+                }}
+              >
+                Upload File Size {Math.round(uploadSizeLimit / 1024)}MB limit
+                exceeded <br />
+                uploaded Size {Math.round(uploadedFilesSize / 1024)}MB
+              </p>
+            )}
+            <LinearProgress
+              variant="determinate"
+              className={`progressBar ${
+                uploadingStatus ? "progressBarActive" : ""
+              }`}
+              value={progress}
+            />
           </div>
           <div className="uploadSectionContentInner">
             <div style={{ marginTop: "auto", marginBottom: "auto" }}>
@@ -747,6 +829,46 @@ const Upload = () => {
                 >
                   Download
                 </button>
+              </div>
+            </div>
+            <div className="statusContainerAnimated">
+              <div className={`statusContainer`} style={{ paddingTop: "25px" }}>
+                <div>
+                  <p
+                    className={`status opacity0 ${
+                      creatingZipProgress > 0 ? "opacity1" : ""
+                    }`}
+                  >
+                    {creatingZipProgress === 100
+                      ? "Zip Created"
+                      : "Creating Zip"}
+                  </p>
+                  <LinearProgress
+                    variant="determinate"
+                    color="info"
+                    className={`progressBar ${
+                      creatingZipProgress !== 0 ? "progressBarActive" : ""
+                    }`}
+                    value={creatingZipProgress}
+                  />
+                </div>
+                <div>
+                  <p
+                    className={`status opacity0 
+                          ${downloadProgess > 0 ? "opacity1" : ""}
+                          `}
+                  >
+                    {downloadProgess == 100 ? "Downloaded" : "Downloading"}
+                  </p>
+                  <LinearProgress
+                    variant="determinate"
+                    color="success"
+                    className={`progressBar ${
+                      downloadProgess !== 0 ? "progressBarActive" : ""
+                    }`}
+                    value={downloadProgess}
+                  />
+                </div>
               </div>
             </div>
           </div>
