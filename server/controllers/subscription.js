@@ -49,7 +49,10 @@ const getSubscriptionDetails = async (req, res) => {
 
 const getSpecificSubscriptionDetails = async (req, res) => {
   try {
-    const { subscriptionType } = req.params;
+    let { subscriptionType } = req.body;
+    if (req.user) {
+      subscriptionType = req.user.subscriptionType;
+    }
     const subscriptionDetails = await subscriptionModel.findOne({
       subscriptionType,
     });

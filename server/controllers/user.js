@@ -7,8 +7,12 @@ const getAllUsersList = async (req, res) => {
       .find({}, { email: 1, username: 1, emailStatus: 1, phoneNumber: 1 })
       .skip((pageNumber - 1) * 10)
       .limit(10);
-    const activeUsers = await userModel.countDocuments({accountStatus : {$eq : true}});
-    const bannedUsers = await userModel.countDocuments({accountStatus : {$eq : false}});
+    const activeUsers = await userModel.countDocuments({
+      accountStatus: { $eq: true },
+    });
+    const bannedUsers = await userModel.countDocuments({
+      accountStatus: { $eq: false },
+    });
     res.send({ success: true, activeUsers, bannedUsers, users });
   } catch (error) {
     console.log(error);
@@ -25,6 +29,10 @@ const getSingleUserDetails = async (req, res) => {
     console.log(error);
     res.send("Error in fetching specific user details");
   }
+};
+
+const getSingleUserSubscriptionDetails = async (req, res) => {
+  res.send("test");
 };
 
 const updateUserDetails = async (req, res) => {
@@ -93,4 +101,5 @@ module.exports = {
   deleteUser,
   updateUserDetails,
   getSingleUserDetails,
+  getSingleUserSubscriptionDetails
 };

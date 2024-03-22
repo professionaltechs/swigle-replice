@@ -37,7 +37,7 @@ const getSingleFile = axios.create({
 });
 
 const fetchSubscriptionDetails = axios.create({
-  baseURL: url + "/subscription/getSubscriptionDetails",
+  baseURL: url + "/subscription",
 });
 
 export { uploadFile, downloadFile, recieveFilesNames, getSingleFile, fetchSubscriptionDetails };

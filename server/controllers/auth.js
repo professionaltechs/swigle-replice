@@ -63,9 +63,6 @@ const loginUser = async (req, res) => {
         subscriptionType: user.subscriptionType,
       },
       "shhhhh",
-      {
-        expiresIn: "7d",
-      }
     );
     res.status(200).send({
       success: true,
