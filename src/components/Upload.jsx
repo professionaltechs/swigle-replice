@@ -19,6 +19,7 @@ import {
   recieveFilesNames,
   getSingleFile,
   fetchSubscriptionDetails,
+  uploadChunks
 } from "../axios/axios";
 
 // OTHERS
@@ -89,7 +90,6 @@ const Upload = () => {
         const requiredHeight = document.getElementsByClassName(
           "uploadAlertContainerInner"
         )[0].offsetHeight;
-        console.log(requiredHeight);
         animatingELement.style.marginTop = `8px`;
         animatingELement.style.height = `${requiredHeight}px`;
       } else {
@@ -109,34 +109,8 @@ const Upload = () => {
     setCode(0);
     const allFiles = [...files, ...uploadedFile];
     setFiles(allFiles);
-    // handleFileUpload(allFiles);
+    handleFileUpload(allFiles);
   };
-
-  // const handleUploadChunk = async (chunk) => {
-  //   const data = new FormData();
-  //   data.append("chunk", chunk);
-  //   const response = await axios.post("/upload-chunk", data);
-  //   // Handle response from backend
-  // };
-
-  // const handleFileUpload = async (files) => {
-  //   const chunkSize = 1024 * 1024 * 10; // 10MB
-  //   const totalFilesSize = files.reduce((total, file) => {
-  //     return total + file.size;
-  //   }, 0);
-  //   const totalFilesSizeInMb = (totalFilesSize / (1024 * 1024)).toFixed(2);
-  //   console.log(totalFilesSize);
-  //   console.log(totalFilesSizeInMb);
-  //   let start = 0;
-  //   let end = Math.min(chunkSize, fileSize);
-
-  //   while (start < fileSize) {
-  //     const chunk = file.slice(start, end);
-  //     await handleUploadChunk(chunk);
-  //     start = end;
-  //     end = Math.min(start + chunkSize, fileSize);
-  //   }
-  // };
 
   const removeUploadedFile = (index) => {
     const newFiles = [...files];
@@ -154,6 +128,54 @@ const Upload = () => {
     );
     setCreatingZipProgress(percentage);
   };
+
+  // const handleUploadChunk = async (chunkedFiles) => {
+  //   console.log(chunkedFiles)
+  //   chunkedFiles.forEach(async (chunk) => {
+  //     const data = new FormData();
+  //     data.append("files", chunk);
+  //     const response = await uploadChunks.post("/", data);
+  //     console.log(response);
+  //   })
+  // };
+
+  // const handleFileUpload = async (files) => {
+  //   // const chunkSize = 1; // 1MB
+  //   // const totalFilesSize = files.reduce((total, file) => {
+  //   //   return total + file.size;
+  //   // }, 0);
+  //   // const totalFilesSizeInMb = (totalFilesSize / (1024 * 1024)).toFixed(2);
+  //   // let start = 0;
+  //   // let end = Math.min(chunkSize, totalFilesSizeInMb);
+
+  //   // while (start < totalFilesSizeInMb) {
+  //   //   const chunk = files.slice(start, end);
+  //   //   await handleUploadChunk(chunk);
+  //   //   start = end;
+  //   //   end = Math.min(start + chunkSize, totalFilesSizeInMb);
+  //   // }
+
+  //   const chunkSize = 1024 * 1024 * 1; // 1MB
+  //   const chunkedFiles = [];
+
+  //   // Iterate through each file
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     const fileSize = file.size;
+  //     let start = 0;
+  //     let end = Math.min(chunkSize, fileSize);
+  //     const chunks = [];
+
+  //     while (start < fileSize) {
+  //       const chunk = file.slice(start, end);
+  //       chunks.push(chunk);
+  //       start = end;
+  //       end = Math.min(start + chunkSize, fileSize);
+  //     }
+  //     chunkedFiles.push(chunks);
+  //   }
+  //   handleUploadChunk(chunkedFiles);
+  // };
 
   const sendFile = async () => {
     if (files.length == 0) {
@@ -201,7 +223,7 @@ const Upload = () => {
 
   const downloadZipFile = async (paramCode) => {
     setDownloadingStatus(true);
-    const response = await downloadcFile.get(`/${downloadCode || paramCode}`, {
+    const response = await downloadFile.get(`/${downloadCode || paramCode}`, {
       onDownloadProgress: (progressEvent) => {
         let progress = Math.round(
           (progressEvent.loaded / progressEvent.total) * 100
@@ -298,7 +320,6 @@ const Upload = () => {
       setUploadSizeLimit(sizeInMegaBytes);
     }
   }, []);
-
 
   useEffect(() => {
     if (downloadProgess == 100) {

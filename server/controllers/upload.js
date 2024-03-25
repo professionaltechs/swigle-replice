@@ -222,9 +222,28 @@ const downloadSIngleFile = async (req, res) => {
   }
 };
 
+const testChunks = async (req, res) => {
+  try {
+    upload(req, res, async (err) => {
+      console.log(req.body);
+      if (err) {
+        console.log(err);
+        res.send({ success: false, message: "Error in uploading file" });
+      } else {
+        console.log(req.files);
+        res.send({ success: true, message: "File uploaded successfully" });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.send({ success: false, message: "Error in Saving file chunks" });
+  }
+};
+
 module.exports = {
   uploadFiles,
   downloadFiles,
   recieveFileNames,
   downloadSIngleFile,
+  testChunks,
 };

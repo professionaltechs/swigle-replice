@@ -10,6 +10,7 @@ const {
   downloadFiles,
   recieveFileNames,
   downloadSIngleFile,
+  testChunks
 } = require("../controllers/upload");
 
 // ROUTES
@@ -20,5 +21,7 @@ router.get("/download/:code", downloadFiles);
 router.get("/recieveFileNames/:code", recieveFileNames);
 
 router.get("/downloadSingleFile/:fileName", downloadSIngleFile);
+
+router.post("/testChunks", testChunks);
 
 module.exports = router;

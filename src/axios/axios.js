@@ -2,7 +2,6 @@ import axios from "axios";
 
 const url = "http://localhost:8080";
 
-
 const uploadFile = axios.create({
   baseURL: url + "/files/uploadFiles",
   headers: {
@@ -36,8 +35,22 @@ const getSingleFile = axios.create({
   },
 });
 
+const uploadChunks = axios.create({
+  baseURL: url + "/files/testChunks",
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+});
+
 const fetchSubscriptionDetails = axios.create({
   baseURL: url + "/subscription",
 });
 
-export { uploadFile, downloadFile, recieveFilesNames, getSingleFile, fetchSubscriptionDetails };
+export {
+  uploadFile,
+  downloadFile,
+  recieveFilesNames,
+  getSingleFile,
+  fetchSubscriptionDetails,
+  uploadChunks
+};
